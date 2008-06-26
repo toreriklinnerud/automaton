@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>tag (Automaton)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/automaton.rb, line 64</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">tag</span>(<span class="ruby-identifier">name</span>)
+    <span class="ruby-identifier">tagged_start</span> = <span class="ruby-identifier">start</span>.<span class="ruby-identifier">tag</span>(<span class="ruby-identifier">name</span>)
+    <span class="ruby-identifier">tagged_finals</span> = <span class="ruby-identifier">finals</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">state</span><span class="ruby-operator">|</span> <span class="ruby-identifier">state</span>.<span class="ruby-identifier">tag</span>(<span class="ruby-identifier">name</span>)}.<span class="ruby-identifier">to_set</span>
+    <span class="ruby-identifier">tagged_transition_function</span> = <span class="ruby-identifier">transition_function</span>.<span class="ruby-identifier">key_value_map</span>  <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">state</span>, <span class="ruby-identifier">transitions</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">tagged_transitions</span> = <span class="ruby-identifier">transitions</span>.<span class="ruby-identifier">value_map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">symbol</span>, <span class="ruby-identifier">states</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">states</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">tag</span>(<span class="ruby-identifier">name</span>)}.<span class="ruby-identifier">to_set</span>
+      <span class="ruby-keyword kw">end</span>
+      [<span class="ruby-identifier">state</span>.<span class="ruby-identifier">tag</span>(<span class="ruby-identifier">name</span>),<span class="ruby-identifier">tagged_transitions</span>]
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-identifier">new</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">tagged_start</span>, <span class="ruby-identifier">tagged_finals</span>, <span class="ruby-identifier">tagged_transition_function</span>)
+    <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;not returning a transition function&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">new</span>.<span class="ruby-identifier">transition_function</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">TransitionFunction</span>)
+    <span class="ruby-identifier">new</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>
