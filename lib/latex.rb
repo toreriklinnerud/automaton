@@ -1,4 +1,9 @@
+# Author::    Tor Erik Linnerud  (tel@jklm.no)
+# Copyright:: Copyright (c) 2008 JKLM DA
+# License::   MIT
+
 class Automaton
+  # Latex representation of an Automaton
   class Latex
     def initialize(initial, finals, states, transitions)
       @initial = Initial.new(initial)
@@ -8,7 +13,7 @@ class Automaton
     end
    
     def to_s
-      template = File.read('tex/template.tex')
+      template = File.read(File.dirname(__FILE__) + '/tex/template.tex')
       template.sub!('STATES', @states.join("\n"))
       template.sub!('TRANSITIONS', @transitions.join("\n"))
       template.sub!('INITIAL', @initial.to_s)

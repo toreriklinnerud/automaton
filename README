@@ -1,0 +1,12 @@
+
+Automaton is a simple pure Ruby implementation of automata. It makes it easy to create, modify and visualize utomata.
+
+===== Dependencies
+Automaton does not have any required dependencies, but Latex is needed if you want to generate drawings from the tex output.
+
+
+===== Origin 
+Automaton was written as a part of my final year project which used automata to model the semantics of a programming language.
+
+===== License
+Automaton is licenced under the MIT-license. (highly permissive, BSD-style)

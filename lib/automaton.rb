@@ -1,7 +1,7 @@
 require 'ruby_extensions'
-require 'set'
 require 'latex'
 require 'layout'
+require 'set'
 
 # Author::    Tor Erik Linnerud  (tel@jklm.no)
 # Author::    Tom Gundersen  (teg@jklm.no)
@@ -11,6 +11,15 @@ class Automaton
   
   attr_reader :start, :finals, :graph, :alphabet
   
+  
+  # Create a new automaton. new is intended for internal use. 
+  # create makes it easier to create an automaton from scratch.
+  # start - A symbol
+  # finals - A set of symbols
+  # graph - A transition function (Graph) which can be created like this:
+  #     Automaton.new(:a, Set[:c], Graph.from_hash(:a => {'1' => Set[:b]}, :b => {'2' => Set[:a, :c]}))
+  # This is interpreted as an Automaton with start state a, final (accepting) states :c, 
+  # a transition from :a to :b on the letter 1 and a transition from :b to :a and :c on the letter 2.
   def initialize(start, finals, graph)
     raise ArgumentError, 'Invalid transition function' unless graph.is_a?(Graph)
     @start = start 
@@ -19,7 +28,13 @@ class Automaton
     @alphabet = graph.values.map{|transitions| transitions.keys}.flatten.to_set
   end
   
-  # Automaton.create(:a, [:c], {:a => {'1' => :b}, :b => {'2' => :c}})
+  # Create a new automaton, intended for public use
+  # Unlike new, create allows you to use a single element instead of an array when you just have a single element. Furthermore, 
+  # graph can be (and must be) a hash, instead of a Graph.
+  # Instead of
+  #     Automaton.new(:a, Set[:c], Graph.from_hash(:a => {'1' => [:b]}, :b => {'2' => [:a, :c]}))
+  # you can now simply do
+  #     Automaton.create(:a, :c, :a => {'1' => :b}, :b => {'2' => :c})
   def self.create(start, finals, graph)
     raise ArgumentError, "finals shouldn't be passed to create as a set" if finals.is_a?(Set)
     nfa_graph = graph.value_map do |state, transitions|
@@ -28,7 +43,7 @@ class Automaton
     self.new(start, [finals].flatten.to_set, Graph.from_hash(nfa_graph)).prune
   end
   
-  # Removes all unreachable states
+  # Keep only reachable states. (Removes all unreachable states.)
   def prune
     reachable_states_cache = reachable_states
     finals = self.finals & reachable_states_cache
@@ -36,7 +51,7 @@ class Automaton
     self.class.new(start, finals, graph)
   end
   
-  # Creates an automata accepting the complement of the language accepted by self
+  # Automaton accepting the complement of the language accepted by self
   def complement
     self.class.new(start, reachable_states - finals, graph)
   end
@@ -55,12 +70,12 @@ class Automaton
     state_transitions.values.inject(Set.new){|reachables, states| reachables + states}
   end
   
-  # Will the DFA accept any string at all?
+  # Will the Automaton accept any string at all?
   def accepting?
     !(reachable_states & finals).empty?
   end
   
-  # Tag each state in the Automaton with the given name
+  # New automaton with each state tagged with the given name
   def tag(name)
     tagged_finals = finals.map{|state| state.tag(name)}.to_set
     tagged_graph = graph.key_value_map  do |state, transitions|
@@ -78,7 +93,7 @@ class Automaton
       graph == other.graph
   end
   
-  # Create the intersection of two automata, which is basically the Cartesian product of the two
+  # Create the intersection of two automata, which is basically the cartesian product of the two
   def intersect(other)
     start = self.start + other.start
     finals = self.finals.to_a.product(other.finals.to_a).map{|a,b| a + b}.to_set
@@ -122,6 +137,7 @@ class Automaton
     end.flatten
   end
   
+  # New automaton which is the total version of self. This means that all states have a transition for every symbol in the alphabet.
   def to_total(alphabet)
     raise ArgumentError unless alphabet.is_a?(Set)
     all_states = Graph.from_hash((reachable_states + [:x]).map{|state| [state, {}]}.to_h)
@@ -135,7 +151,7 @@ class Automaton
   
   # Image of the Automaton in the form of a string of latex
   def to_tex
-    nodes = reachable_states.each_with_index.map{|state, i| [state, Layout::Node.new(state, i, i)]}.to_h
+    nodes = reachable_states.each_with_index.map{|state, i| [state, Layout::Node.new(state, rand * i , rand * i)]}.to_h
     transitions.each do |transition|
         nodes[transition.from].connect(nodes[transition.to])
     end

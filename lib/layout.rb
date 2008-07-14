@@ -6,23 +6,25 @@ require 'set'
 # License::   MIT
 
 class Automaton
+  # An ad-hoc implmenentation of a spring-force algorithm to layout the automaton graph.
   class Layout
 
-    SPRING_LENGTH = 1
-    REPULSION = 5
+    SPRING_LENGTH = 3
+    REPULSION = 3
     ATTRACTION = 1
-    TIMESTEP = 0.5
-    ENERGY_TRESHOLD = 0.0001
-    DAMPING = 0.75
+    TIMESTEP = 0.25
+    ENERGY_TRESHOLD = 0.1
+    DAMPING = 0.8
     
     attr_reader :nodes
     def initialize(*nodes)
       @nodes = nodes
     end
+
     
     def force_direct
       nodes.each{|node| node.velocity = Vector[0.0, 0.0]}
-      total_kinetic_energy = 9999
+      total_kinetic_energy = ENERGY_TRESHOLD + 1
       until total_kinetic_energy < ENERGY_TRESHOLD
         total_kinetic_energy = 0.0
         nodes.each do |node|
@@ -47,6 +49,7 @@ class Automaton
       nodes.map{|node| node.position}.inspect
     end
     
+    # A spring connected, repulsing node used by the spring force algorithm
     class Node
       attr_reader :name
       attr_accessor :position, :velocity, :connections
@@ -70,7 +73,7 @@ class Automaton
 
       def repulsion(other)
         vector = vector(other)
-        vector.unit * (1 / (4 * Math::PI * REPULSION * vector.r**2))
+        vector.unit * REPULSION * (1 / (4 * Math::PI * vector.r**2))
       end
 
       def attraction(other)
@@ -96,7 +99,6 @@ class Automaton
       end
       
       def to_a
-        puts "helllllo"
         [name, x, y]
       end
     end
