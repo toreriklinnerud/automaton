@@ -28,14 +28,14 @@ describe Automaton::Layout do
     end
     
     it "has repulsion" do 
-      @a.repulsion(@b).should be_close_to_enum(Vector[0, 0.079], 0.01)
+      @a.repulsion(@b).should be_close_to_enum(Vector[0, 0.23], 0.01)
       @a.repulsion(@c).should == -@c.repulsion(@a)
-      @a.repulsion(@c).should be_close_to_enum(Vector[0.0049, 0], 0.01)
+      @a.repulsion(@c).should be_close_to_enum(Vector[0.0149, 0], 0.01)
     end
     
     it "has attraction" do
-      @a.attraction(@b).should be_close_to_enum(Vector[0,  0], 0.01)
-      @a.attraction(@c).should be_close_to_enum(Vector[3, 0], 0.01)
+      @a.attraction(@b).should be_close_to_enum(Vector[0,  -0.8], 0.01)
+      @a.attraction(@c).should be_close_to_enum(Vector[0.4, 0], 0.01)
       @a.attraction(@c).should == -@c.attraction(@a)
       @b.attraction(@c).should be_close_to_enum(Vector[0, 0], 0.01)
     end

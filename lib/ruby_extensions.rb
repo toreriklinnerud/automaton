@@ -1,6 +1,6 @@
 # Various monkeypatching
 
-class Array
+class Array #:nodoc:
   # Turns an array of the form [[key, value], ...] into a hash of the form {key => value }
   #     [[:a, 1], [:b, 2]].to_h    #=> {a => 1, :b => 2}
   def to_h
@@ -8,7 +8,7 @@ class Array
   end
 end
 
-class Symbol
+class Symbol #:nodoc:
   # Create a new symbol with _name added
   def tag(name)
     "#{self}_#{name}".to_sym
@@ -20,7 +20,7 @@ class Symbol
   end
 end
 
-class Hash  
+class Hash #:nodoc:
   # Invokes block once for each pair of self, each time yielding a new key, value pair.
   # Returns a new hash with the values of the original hash replaced by those returned from the block.
   #

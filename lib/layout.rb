@@ -11,7 +11,7 @@ class Automaton
 
     SPRING_LENGTH = 3
     REPULSION = 3
-    ATTRACTION = 1
+    ATTRACTION = 0.40
     TIMESTEP = 0.25
     ENERGY_TRESHOLD = 0.1
     DAMPING = 0.8

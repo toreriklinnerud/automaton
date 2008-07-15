@@ -9,7 +9,7 @@ end
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 
 
-module EnumerableMatchers
+module EnumerableMatchers #:nodoc:
   class BeCloseToEnum #:nodoc:
     def initialize(expected, delta)
       @expected = expected

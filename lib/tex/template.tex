@@ -7,18 +7,18 @@
   
   % states
   %\State[p]{(0,0)}{A} \State{(3,0)}{B} \State[r]{(6,0.5)}{C}
-  STATES
+  <%= @states.join("\n")%>
  
   % initial--final
   % \Initial{A}
-  INITIAL
+  <%= @initial %>
   
   % \Final{C}
-  FINAL
+  <%= @finals.join("\n")%>
 
   % transitions
   %\EdgeL{B}{A}{a} \EdgeL{B}{C}{b}
-  TRANSITIONS
+  <%= @transitions.join("\n") %>
   
 \end{VCPicture}
 \end{document}

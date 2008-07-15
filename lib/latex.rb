@@ -2,6 +2,9 @@
 # Copyright:: Copyright (c) 2008 JKLM DA
 # License::   MIT
 
+require 'rtex'
+require 'fileutils'
+
 class Automaton
   # Latex representation of an Automaton
   class Latex
@@ -12,13 +15,15 @@ class Automaton
       @transitions = transitions.map{|transition| Transition.new(*transition.to_a)}
     end
    
-    def to_s
-      template = File.read(File.dirname(__FILE__) + '/tex/template.tex')
-      template.sub!('STATES', @states.join("\n"))
-      template.sub!('TRANSITIONS', @transitions.join("\n"))
-      template.sub!('INITIAL', @initial.to_s)
-      template.sub!('FINAL', @finals.join("\n"))
-      template
+    def render_pdf(file_path)
+      target_path = File.expand_path(file_path)
+      our_path = File.expand_path(File.dirname(__FILE__))
+      ENV['TEXINPUTS'] = ".:#{our_path}/tex:"
+      template = File.read("#{our_path}/tex/template.tex")
+      doc = RTeX::Document.new(template, :processor => 'tex2pdf')
+      doc.to_pdf(binding) do |tempfile_path|
+        FileUtils.mv tempfile_path, target_path
+      end
     end
     
     def values
