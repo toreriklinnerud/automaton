@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+if ARGV.empty?
+  puts "Usage: tex2pdf tex-file.tex" 
+  exit
+end
+
+file = File.basename(ARGV.last, '.tex')
+`latex --interaction=batchmode #{file}`
+`dvipdf #{file}`
