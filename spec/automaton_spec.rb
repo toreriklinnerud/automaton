@@ -2,30 +2,55 @@ require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'automaton'
 
 describe Automaton do
+ 
+  def example(*args, &block)
+    @a ||= Automaton.build(*args, &block)
+  end
   
+  def expected(*args, &block)
+    @e ||= Automaton.build(*args, &block)
+  end
+
   it "can be pruned" do
-    automata = Automaton.create(:a, :b, {:a => {'1' => [:b], '2' => [:d]}, :c => {'3' => [:b]}})
-    expected = Automaton.create(:a, :b, {:a => {'1' => [:b], '2' => [:d]}})
-    automata.prune.should == expected
+    example(:a, :b) do 
+      a('1' => :b, 
+        '2' => :d)
+      c('3' => :b)
+    end
+      
+    expected(:a, :b) do
+      a('1' => :b, '2' => :d)
+    end
+    
+    example.prune.should == expected
   end
   
   it "has successors" do
-    automata = Automaton.create(:a, :b, {:a => {'1' => [:b, :c], '2' => [:d]}, :c => {'3' => [:b]}})
-    automata.successors_of(:a).should == Set[:b, :c, :d]
-    automata.successors_of(:b).should == Set.new
-    automata.successors_of(:c).should == Set[:b]
+    example(:a, :b) do
+      a('1' => [:b, :c], 
+        '2' => :d)
+      c('3' => :b)
+    end
+    
+    example.successors_of(:a).should == Set[:b, :c, :d]
+    example.successors_of(:b).should == Set[]
+    example.successors_of(:c).should == Set[:b]
   end
   
   it "has start state and final states" do
-    automata = Automaton.create(:a, :b, {:a => {'1' => [:b, :c], '2' => [:d]}, :c => {'3' => [:b]}})
-    automata.start.should == :a
-    automata.finals.should == Set[:b]
+    example(:a, :b) do 
+      a('1' => [:b, :c], '2' => :d)
+      c('3' => :b)
+    end
+    
+    example.start.should == :a
+    example.finals.should == Set[:b]
   end
   
   it "is comparable" do
-    a = Automaton.create(:a, :b, '1' => {:a => :b})
-    b = Automaton.create(:a, :b, '1' => {:a => :b})
-    a.should == b
+    example(:a, :b) { a('1' => :b) }
+    expected(:a, :b){ a('1' => :b) }
+    example.should == expected
   end
   
   it "is taggable" do
@@ -36,12 +61,6 @@ describe Automaton do
   it "has reachable states" do
     automata = Automaton.create(:a, :b, {:a => {'1' => [:b, :c], '2' => [:d]}, :x => {'3' => [:a]}})
     automata.reachable_states.should == Set[:a, :b, :c, :d]
-  end
-  
-  #NOTE This is meaningless now that the states are stored as a set
-  it "does not repeat reachable states" do
-    automata = Automaton.create(:a, :a, {:a => {'1' => [:a]}})
-    automata.reachable_states.should == Set[:a]
   end
   
   it "can deal with loops on reachable states" do
@@ -57,6 +76,7 @@ describe Automaton do
   end
   
   it "has transitions" do 
+    pending
     automaton = Automaton.create(:a, :b, :a => {'1' => [:b, :c], '2' => [:d]}, :b => {'3' => [:f]})
     one = Automaton::Transition.new(:a, Set[:b, :c], '1')
     two = Automaton::Transition.new(:a, Set[:d], '2')
@@ -142,6 +162,7 @@ describe Automaton do
   end
   
   it "has a latex representation" do
+    pending
     small = Automaton.create(:a, :b, :a => {'1' => :b})
     latex = Automaton::Latex.new(:a, [:b], [[:a, 0, 0], [:b, 1, 1]], [[:a, :b, '1']])
     small.to_tex.should == latex

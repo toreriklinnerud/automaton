@@ -43,6 +43,23 @@ class Automaton
     self.new(start, [finals].flatten.to_set, Graph.from_hash(nfa_graph)).prune
   end
   
+  class Builder
+    attr_reader :hash
+    def initialize
+      @hash = {}
+    end
+    def method_missing(method, *args)
+      raise "#{method} has no transitions" if args.empty?
+      @hash[method] = args.first
+    end
+  end
+  
+  def self.build(start, finals, &block)
+    builder = Builder.new
+    builder.instance_eval(&block)
+    self.create(start, finals, builder.hash)
+  end
+  
   # Keep only reachable states. (Removes all unreachable states.)
   def prune
     reachable_states_cache = reachable_states
@@ -149,6 +166,19 @@ class Automaton
     self.class.new(start, finals, total_graph).prune
   end
   
+  def inspect
+    graph.map do |state, transitions|
+      star = start == state ? '<-' : ''
+      "\n#{state}#{star}\n" + 
+      transitions.map do |from, to|
+        list = to.map do |symbol|
+          finals.include?(symbol)? "(#{symbol})" : "#{symbol}"
+        end.join(', ')
+        "  #{from}: #{list}"
+      end.join("\n")
+    end.join("\n")
+  end
+  
   # Image of the Automaton in the form of a string of latex
   def to_tex
     nodes = reachable_states.each_with_index.map{|state, i| [state, Layout::Node.new(state, rand * i , rand * i)]}.to_h
@@ -236,7 +266,7 @@ class Automaton
     def prune(reachable_states)
       pruned = self.select do |state,_|
         reachable_states.include? state
-      end.to_h
+      end
       Graph.from_hash(pruned)
     end
   end
